@@ -17,12 +17,22 @@
   <style>
     body {
       background-color: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     .container {
       margin-top: 50px;
+      flex: 1;
     }
     textarea {
       resize: none;
+    }
+    footer {
+      text-align: center;
+      background-color: #f1f1f1;
+      padding: 10px 0;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -76,6 +86,10 @@
     </div>
   </div>
 
+  <footer>
+    Versão: 1.0.0 | Desenvolvido com 💡 por ChatGPT Advogado
+  </footer>
+
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -87,7 +101,7 @@
     const responseCard = document.getElementById("responseCard");
 
     // Insira sua chave API diretamente aqui
-    const apiKey = "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";
+    const apiKey = "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";
 
     // Função para extrair texto de arquivos PDF
     async function extractTextFromPDF(file) {
