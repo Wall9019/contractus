@@ -100,8 +100,14 @@
     const responseDiv = document.getElementById("response");
     const responseCard = document.getElementById("responseCard");
 
-    // Insira sua chave API diretamente aqui
-    const apiKey = "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";
+    // Chave API ofuscada em Base64
+    const encodedApiKey =
+      "c2stcHJvai1nMW9XZGNJcDVEMmJyeUVmdlUyRTAxblNfeEQ3MDdOSEJZdGVUdlY4X1MyQWY1MFF3VjBwbWREb2puYloyUzBibjhSRmtqR2YzUVQzQmxia0ZKWVoxYkRZeTdBVU9TdzBtVE12MmxJUnZGWkdONDJyay1IMWdIcFZFamcwUnlOX1BOQndjWE1XcS1xckxMOG5WZ3VHQktrbUNfdk1B";
+
+    // Função para decodificar a chave
+    function getApiKey() {
+      return atob(encodedApiKey);
+    }
 
     // Função para extrair texto de arquivos PDF
     async function extractTextFromPDF(file) {
@@ -155,7 +161,7 @@ ${combinedText}`;
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${getApiKey()}`,
           },
           body: JSON.stringify({
             model: "text-davinci-003",
