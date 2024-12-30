@@ -1,226 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatGPT Advogado</title>
-
-  <!-- Link para Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
-  <!-- Link para jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
-
-  <style>
-    body {
-      background-color: #f8f9fa;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    .container {
-      margin-top: 50px;
-      flex: 1;
-    }
-    textarea {
-      resize: none;
-    }
-    footer {
-      text-align: center;
-      background-color: #f1f1f1;
-      padding: 10px 0;
-      font-size: 14px;
-    }
-  </style>
+  <title>Teste de Chave</title>
 </head>
 <body>
-  <div class="container">
-    <div class="text-center mb-5">
-      <h1 class="display-4">ChatGPT Advogado</h1>
-      <p class="lead">Análise de contratos feita por IA de forma simples e eficaz</p>
-    </div>
-
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <form id="contractForm">
-          <div class="mb-3">
-            <label for="input" class="form-label">Texto do Contrato</label>
-            <textarea
-              class="form-control"
-              id="input"
-              rows="6"
-              placeholder="Digite ou cole o texto do contrato aqui..."
-            ></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="fileInput" class="form-label">Carregar Arquivo (PDF ou Word)</label>
-            <input
-              type="file"
-              class="form-control"
-              id="fileInput"
-              accept=".pdf, .docx"
-            />
-          </div>
-          <div class="d-grid gap-2">
-            <button type="button" class="btn btn-primary" id="analyzeButton">
-              Analisar Contrato
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div id="responseCard" class="card mt-4 shadow-sm d-none">
-      <div class="card-body">
-        <h5 class="card-title">Resultado da Análise</h5>
-        <pre id="response" class="p-3 bg-light text-dark border rounded"></pre>
-        <div class="d-grid gap-2 mt-3">
-          <button type="button" class="btn btn-success" id="downloadButton">
-            Baixar Relatório (PDF)
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    Versão: v1.0.0 Vince 003 | Desenvolvido com 💡 por ChatGPT Advogado
-  </footer>
-
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  <h1>Testando a chave</h1>
+  <button onclick="testarChave()">Testar Chave</button>
+  <p id="resultado"></p>
 
   <script>
-    const analyzeButton = document.getElementById("analyzeButton");
-    const downloadButton = document.getElementById("downloadButton");
-    const fileInput = document.getElementById("fileInput");
-    const responseDiv = document.getElementById("response");
-    const responseCard = document.getElementById("responseCard");
+    const chave = "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";
 
-    // Chave API ofuscada em Base64
-    const encodedApiKey =
-      "c2stcHJvai1nMW9XZGNJcDVEMmJyeUVmdlUyRTAxblNfeEQ3MDdOSEJZdGVUdlY4X1MyQWY1MFF3VjBwbWREb2puYloyUzBibjhSRmtqR2YzUVQzQmxia0ZKWVoxYkRZeTdBVU9TdzBtVE12MmxJUnZGWkdONDJyay1IMWdIcFZFamcwUnlOX1BOQndjWE1XcS1xckxMOG5WZ3VHQktrbUNfdk1B";
+    function testarChave() {
+      // Exibe a chave original
+      document.getElementById("resultado").innerText = `Chave fornecida: ${chave}`;
 
-    // Função para decodificar a chave
-    function getApiKey() {
-      try {
-        return atob(encodedApiKey); // Decodifica a chave
-      } catch (error) {
-        console.error("Erro ao decodificar a chave API:", error);
-        alert("Erro na configuração da chave API. Verifique se foi configurada corretamente.");
-        return null;
-      }
+      // Ofuscação: substituindo caracteres por valores alternados
+      let chaveOfuscada = ofuscarChave(chave);
+      document.getElementById("resultado").innerText += `\nChave ofuscada: ${chaveOfuscada}`;
+
+      // Desofuscando a chave (inverter o processo)
+      let chaveDesofuscada = desofuscarChave(chaveOfuscada);
+      document.getElementById("resultado").innerText += `\nChave desofuscada: ${chaveDesofuscada}`;
     }
 
-    // Função para enviar solicitação para a API OpenAI
-    async function callOpenAiApi(prompt) {
-      const apiKey = getApiKey();
-      if (!apiKey) {
-        console.error("Chave API não disponível ou mal configurada.");
-        return;
+    // Função para ofuscar a chave
+    function ofuscarChave(chave) {
+      let chaveOfuscada = '';
+      for (let i = 0; i < chave.length; i++) {
+        let char = chave.charCodeAt(i);
+        chaveOfuscada += String.fromCharCode(char + 1); // Substitui cada caractere por um valor adjacente
       }
-
-      try {
-        const response = await fetch("https://api.openai.com/v1/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model: "text-davinci-003",
-            prompt: prompt,
-            max_tokens: 500,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorDetails = await response.json();
-          console.error("Erro ao chamar a API OpenAI:", errorDetails);
-          alert(`Erro da API: ${errorDetails.error.message}`);
-          return;
-        }
-
-        const data = await response.json();
-        return data.choices[0].text.trim();
-      } catch (error) {
-        console.error("Erro na solicitação à API OpenAI:", error);
-        alert("Erro ao conectar-se à API OpenAI. Verifique sua conexão ou chave.");
-      }
+      return chaveOfuscada;
     }
 
-    // Manipulador de eventos para o botão de análise
-    analyzeButton.addEventListener("click", async () => {
-      const inputText = document.getElementById("input").value;
-      let fileText = "";
-
-      // Processar arquivo carregado
-      const file = fileInput.files[0];
-      if (file) {
-        const fileType = file.type;
-        try {
-          if (fileType === "application/pdf") {
-            fileText = await extractTextFromPDF(file);
-          } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-            fileText = await extractTextFromWord(file);
-          } else {
-            alert("Formato de arquivo não suportado.");
-            return;
-          }
-        } catch (error) {
-          console.error("Erro ao processar arquivo:", error);
-          alert("Erro ao processar o arquivo carregado. Verifique o formato e tente novamente.");
-          return;
-        }
+    // Função para desofuscar a chave
+    function desofuscarChave(chaveOfuscada) {
+      let chaveDesofuscada = '';
+      for (let i = 0; i < chaveOfuscada.length; i++) {
+        let char = chaveOfuscada.charCodeAt(i);
+        chaveDesofuscada += String.fromCharCode(char - 1); // Reverte a substituição de caracteres
       }
-
-      const combinedText = inputText + "\n\n" + fileText;
-      const prompt = `Você é uma Inteligência Artificial avançada... \n\n${combinedText}`;
-
-      // Chamar a API OpenAI
-      const analysis = await callOpenAiApi(prompt);
-      if (analysis) {
-        responseDiv.textContent = analysis;
-        responseCard.classList.remove("d-none");
-        downloadButton.dataset.analysis = analysis;
-      }
-    });
-
-    downloadButton.addEventListener("click", () => {
-      const analysis = downloadButton.dataset.analysis;
-      if (!analysis) {
-        alert("Nenhuma análise disponível para download.");
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Relatório de Análise Contratual", 10, 10);
-      doc.text(analysis, 10, 20);
-      doc.save("relatorio.pdf");
-    });
-
-    // Funções para processar arquivos (PDF e Word)
-    async function extractTextFromPDF(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-      const pages = pdfDoc.getPages();
-      let text = "";
-      for (const page of pages) {
-        text += await page.getTextContent().then((content) =>
-          content.items.map((item) => item.str).join(" ")
-        );
-      }
-      return text;
-    }
-
-    async function extractTextFromWord(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const result = await Mammoth.extractRawText({ arrayBuffer });
-      return result.value;
+      return chaveDesofuscada;
     }
   </script>
 </body>
