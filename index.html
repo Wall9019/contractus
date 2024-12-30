@@ -11,11 +11,8 @@
     rel="stylesheet"
   >
   <!-- Link para jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-
-  <!-- Script para Leitura de Arquivos (pdf-lib para PDFs) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.27.2/docxtemplater.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
 
   <style>
     body {
@@ -89,34 +86,30 @@
     const responseDiv = document.getElementById("response");
     const responseCard = document.getElementById("responseCard");
 
-    // Chave API ofuscada em Base64
-    const encodedApiKey =
-      "c2stcHJvai1OMTN4MFdGMzY2VW9UcEpQOVc2aUVlaVNFaXVMRHBscENoZzFPbk0zdEVXNWxPLXFBTWtVM25ZLVZfSW9pMGNXT3hDdFpKZ1FwZVQzQmxia0ZKdno2YXV5M1dKZ1RkRUdPSkZqdWJocHJQQlRmM2JlamlIbXZhMEFhQ056S0ZYdm1EZkxCZjF1bWk5cEViS1NWZUg5M2dlWWxRY0E=";
-
-    // Função para decodificar a chave
-    function getApiKey() {
-      return atob(encodedApiKey);
-    }
+    // Insira sua chave API diretamente aqui
+    const apiKey = "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";
 
     // Função para extrair texto de arquivos PDF
     async function extractTextFromPDF(file) {
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-      const text = await pdfDoc.getTextContent();
-      return text.items.map(item => item.str).join(" ");
+      const pages = pdfDoc.getPages();
+      let text = "";
+
+      for (const page of pages) {
+        text += await page.getTextContent().then((content) =>
+          content.items.map((item) => item.str).join(" ")
+        );
+      }
+
+      return text;
     }
 
     // Função para extrair texto de arquivos Word (docx)
     async function extractTextFromWord(file) {
-      const reader = new FileReader();
-      return new Promise((resolve) => {
-        reader.onload = (event) => {
-          const content = new Uint8Array(event.target.result);
-          const doc = new Docxtemplater().loadZip(content);
-          resolve(doc.getFullText());
-        };
-        reader.readAsArrayBuffer(file);
-      });
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await Mammoth.extractRawText({ arrayBuffer });
+      return result.value;
     }
 
     analyzeButton.addEventListener("click", async () => {
@@ -148,7 +141,7 @@ ${combinedText}`;
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${getApiKey()}`,
+            Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
             model: "text-davinci-003",
@@ -156,6 +149,13 @@ ${combinedText}`;
             max_tokens: 500,
           }),
         });
+
+        if (!response.ok) {
+          const errorDetails = await response.json();
+          console.error("Erro da API:", errorDetails);
+          alert(`Erro da API: ${errorDetails.error.message}`);
+          return;
+        }
 
         const data = await response.json();
         const analysis = data.choices[0].text.trim();
