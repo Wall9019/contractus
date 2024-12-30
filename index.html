@@ -100,17 +100,18 @@
     const responseDiv = document.getElementById("response");
     const responseCard = document.getElementById("responseCard");
 
-    // Chave API (ofuscada)
+    // Chave API ofuscada em Base64
     const encodedApiKey =
-      "c2stcHJvai1nMW9XZGNJcDVEMmJyeUVmdlU..."; // Parte da chave foi encurtada para exemplo
+      "c2stcHJvai1nMW9XZGNJcDVEMmJyeUVmdlUyRTAxblNfeEQ3MDdOSEJZdGVUdlY4X1MyQWY1MFF3VjBwbWREb2puYloyUzBibjhSRmtqR2YzUVQzQmxia0ZKWVoxYkRZeTdBVU9TdzBtVE12MmxJUnZGWkdONDJyay1IMWdIcFZFamcwUnlOX1BOQndjWE1XcS1xckxMOG5WZ3VHQktrbUNfdk1B";
 
     // Função para decodificar a chave
     function getApiKey() {
       try {
-        return atob(encodedApiKey);
+        return atob(encodedApiKey); // Decodifica a chave
       } catch (error) {
         console.error("Erro ao decodificar a chave API:", error);
         alert("Erro na configuração da chave API. Verifique se foi configurada corretamente.");
+        return null;
       }
     }
 
