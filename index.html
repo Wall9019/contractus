@@ -3,47 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste de Chave</title>
+  <title>Testar Resposta da API com Chave Ofuscada</title>
 </head>
 <body>
-  <h1>Testando a chave</h1>
-  <button onclick="testarChave()">Testar Chave</button>
+  <h1>Teste de Resposta da API com Chave Ofuscada</h1>
+  <button onclick="testarApi()">Testar API</button>
   <p id="resultado"></p>
 
   <script>
-    const chave = "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";
+    // Chave ofuscada (a chave real está criptografada)
+    const chaveOfuscada = "c2stcHJvai1nMW9XY2NJcDVEMmJyeUVmdlUyRTAxblMgeERQNzA3TkhCWXRlVnY4X1MyQWY1MFdxVjBwbWRKb2pubjJTMGJueFJGa2o1UVQzQmxrY1l6MUE3QVVPYzB3bVRNdjJkSVJ2RlNaR042cmtIMWdIYlZFajByeU5fUE5Cd2NXTXdqLXFyTEw4bkd1R0JrY01fdk1h"; 
 
-    function testarChave() {
-      // Exibe a chave original
-      document.getElementById("resultado").innerText = `Chave fornecida: ${chave}`;
-
-      // Ofuscação: substituindo caracteres por valores alternados
-      let chaveOfuscada = ofuscarChave(chave);
-      document.getElementById("resultado").innerText += `\nChave ofuscada: ${chaveOfuscada}`;
-
-      // Desofuscando a chave (inverter o processo)
-      let chaveDesofuscada = desofuscarChave(chaveOfuscada);
-      document.getElementById("resultado").innerText += `\nChave desofuscada: ${chaveDesofuscada}`;
+    // Função para "desofuscar" a chave (decodificando de Base64)
+    function desofuscarChave(chave) {
+      let decoded = atob(chave);  // Decodifica de Base64 para a chave original
+      return decoded;
     }
 
-    // Função para ofuscar a chave
-    function ofuscarChave(chave) {
-      let chaveOfuscada = '';
-      for (let i = 0; i < chave.length; i++) {
-        let char = chave.charCodeAt(i);
-        chaveOfuscada += String.fromCharCode(char + 1); // Substitui cada caractere por um valor adjacente
-      }
-      return chaveOfuscada;
-    }
+    async function testarApi() {
+      try {
+        // Desofuscar a chave antes de usá-la na requisição
+        const chave = desofuscarChave(chaveOfuscada);
 
-    // Função para desofuscar a chave
-    function desofuscarChave(chaveOfuscada) {
-      let chaveDesofuscada = '';
-      for (let i = 0; i < chaveOfuscada.length; i++) {
-        let char = chaveOfuscada.charCodeAt(i);
-        chaveDesofuscada += String.fromCharCode(char - 1); // Reverte a substituição de caracteres
+        // URL da API (substitua com a URL real da sua API)
+        const url = 'https://api.exemplo.com/endpoint';
+
+        // Configuração da requisição
+        const response = await fetch(url, {
+          method: 'GET', // ou 'POST', dependendo do tipo de API
+          headers: {
+            'Authorization': `Bearer ${chave}`, // Enviando a chave na autorização
+            'Content-Type': 'application/json'
+          }
+        });
+
+        // Verificando a resposta da API
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById("resultado").innerText = `Resposta da API: ${JSON.stringify(data)}`;
+        } else {
+          document.getElementById("resultado").innerText = `Erro na resposta: ${response.statusText}`;
+        }
+      } catch (error) {
+        document.getElementById("resultado").innerText = `Erro na requisição: ${error.message}`;
       }
-      return chaveDesofuscada;
     }
   </script>
 </body>
