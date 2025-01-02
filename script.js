@@ -1,18 +1,17 @@
-/**************************************
+/*******************************************************
  * script.js
- * Frontend Puro + PDF.js + Mammoth.js
- **************************************/
+ * Frontend + PDF.js + Mammoth.js + API ChatGPT (Bootstrap)
+ *******************************************************/
 
-// API KEY "OFUSCADA" (Base64) => "sk-proj-l2VRQFDF9Z..."
-const encodedApiKey = "YzJzdGtjanN5QXJnaG82UU1WOG9tQ2ZpY2lhbCENCiBza3AtcHJvai1sMlZSUUZERjladkFUa3lnWklRcXNrc2xtdS1hQVE2Y3phUFUxUUZoNXM0alJDeHpTQ0tDV0stQ05tWVlMTnhnWEVEclZiaHBnSHNUM0JsYmtGSjQtajBVc0NCSG5qNC1kMFRhc3JyUFdmVC1jYW9XcHBqZTFieDRuUmFoNWhYbU5JSzBLa0Job3Rvb1RrVHVqM0FRMXZ6NHFLUDRB";
+// Chave da API do ChatGPT, "OFUSCADA" (Base64) meramente didática:
+const encodedApiKey = "c2stcHJvai1sMlZSUUZERjladkFUa3lnWklRcXNrc2xtdS1hQVE2Y3phUFUxUUZoNXM0alJDeHpTQ0tDV0stQ05tWVlMTnhnWEVEclZiaHBnSHNUM0JsYmtGSjQtajBVc0NCSG5qNC1kMFRhc3JyUFdmVC1jYW9XcHBqZTFieDRuUmFoNWhYbU5JSzBLa0Job3Rvb1RrVHVqM0FRMXZ6NHFLUDRB";
 
-// Decodifica a chave
+// Decodifica a chave em tempo de execução
 function getApiKey() {
-  // Remove quebras de linha e decode
-  return atob(encodedApiKey.replace(/\s+/g, ''));
+  return atob(encodedApiKey);
 }
 
-// Seletores de elementos
+// Referências ao DOM
 const fileInput = document.getElementById("fileInput");
 const manualButton = document.getElementById("manualButton");
 const manualSection = document.getElementById("manual-section");
@@ -24,26 +23,29 @@ const analysisResultsDiv = document.getElementById("analysis-results");
 const downloadReportBtn = document.getElementById("downloadReportBtn");
 const newAnalysisBtn = document.getElementById("newAnalysisBtn");
 
-// ----------------------------------------
-//  EXIBIR/OCULTAR SEÇÕES
-// ----------------------------------------
+// ---------------------------------------
+//  Função para Exibir/ocultar Seções
+// ---------------------------------------
 function showSection(section) {
+  // Lista de seções que podem ficar ocultas
   [manualSection, loadingSection, resultsSection].forEach((sec) => {
-    sec.classList.add("hidden");
+    sec.classList.add("d-none");
   });
-  if (section) section.classList.remove("hidden");
+  if (section) {
+    section.classList.remove("d-none");
+  }
 }
 
-// ----------------------------------------
+// ---------------------------------------
 //  BOTÃO "INSERIR TEXTO MANUALMENTE"
-// ----------------------------------------
+// ---------------------------------------
 manualButton.addEventListener("click", () => {
   showSection(manualSection);
 });
 
-// ----------------------------------------
+// ---------------------------------------
 //  UPLOAD DE ARQUIVO PDF/WORD
-// ----------------------------------------
+// ---------------------------------------
 fileInput.addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -56,7 +58,7 @@ fileInput.addEventListener("change", async (e) => {
     return;
   }
 
-  // Exibe "Carregando..."
+  // Mostra "Carregando..."
   showSection(loadingSection);
 
   try {
@@ -67,7 +69,7 @@ fileInput.addEventListener("change", async (e) => {
       extractedText = await convertWordToText(file);
     }
 
-    // Chama análise
+    // Chama análise do ChatGPT
     const analysis = await analyzeText(extractedText);
     showAnalysisResults(analysis);
   } catch (error) {
@@ -77,16 +79,15 @@ fileInput.addEventListener("change", async (e) => {
   }
 });
 
-// ----------------------------------------
+// ---------------------------------------
 //  BOTÃO "INICIAR ANÁLISE" (TEXTO MANUAL)
-// ----------------------------------------
+// ---------------------------------------
 analyzeManualBtn.addEventListener("click", async () => {
   const userInput = manualTextArea.value.trim();
   if (!userInput) {
     alert("Por favor, insira o texto do contrato.");
     return;
   }
-
   showSection(loadingSection);
   try {
     const analysis = await analyzeText(userInput);
@@ -98,9 +99,9 @@ analyzeManualBtn.addEventListener("click", async () => {
   }
 });
 
-// ----------------------------------------
-//  FUNÇÃO CONVERSÃO PDF -> TEXTO COM PDF.js
-// ----------------------------------------
+// ---------------------------------------
+//  FUNÇÃO converter PDF -> texto c/ PDF.js
+// ---------------------------------------
 async function convertPdfToText(file) {
   const arrayBuffer = await file.arrayBuffer();
   const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -117,27 +118,27 @@ async function convertPdfToText(file) {
   return extractedText;
 }
 
-// ----------------------------------------
-//  FUNÇÃO CONVERSÃO WORD -> TEXTO COM MAMMOTH.js
-// ----------------------------------------
+// ---------------------------------------
+//  FUNÇÃO converter Word -> texto c/ Mammoth
+// ---------------------------------------
 async function convertWordToText(file) {
   const arrayBuffer = await file.arrayBuffer();
   const result = await window.mammoth.extractRawText({ arrayBuffer });
   return result.value;
 }
 
-// ----------------------------------------
+// ---------------------------------------
 //  CHAMADA À API DO CHATGPT
-// ----------------------------------------
+// ---------------------------------------
 async function analyzeText(inputText) {
   const myApiKey = getApiKey();
 
   const prompt = `
 Você é uma Inteligência Artificial especializada na análise de contratos sociais. 
 Verifique lacunas, inconsistências ou ausência de cláusulas obrigatórias, 
-baseando-se no Código Civil Brasileiro (Lei nº 10.406/2002) e especialmente no art. 997.
+com base no Código Civil Brasileiro (Lei nº 10.406/2002), especialmente o art. 997.
 
-Texto do contrato a analisar:
+Contrato a analisar:
 "${inputText}"
 `;
 
@@ -163,17 +164,17 @@ Texto do contrato a analisar:
   return result.choices[0].text.trim();
 }
 
-// ----------------------------------------
-//  EXIBE RESULTADOS NA TELA
-// ----------------------------------------
+// ---------------------------------------
+//  EXIBIÇÃO DE RESULTADOS NA TELA
+// ---------------------------------------
 function showAnalysisResults(analysisText) {
   analysisResultsDiv.textContent = analysisText;
   showSection(resultsSection);
 }
 
-// ----------------------------------------
-//  DOWNLOAD DO RELATÓRIO (TEXTO PURO)
-// ----------------------------------------
+// ---------------------------------------
+//  DOWNLOAD DO RELATÓRIO EM TXT
+// ---------------------------------------
 downloadReportBtn.addEventListener("click", () => {
   const blob = new Blob([analysisResultsDiv.textContent], {
     type: "text/plain;charset=utf-8",
@@ -187,9 +188,9 @@ downloadReportBtn.addEventListener("click", () => {
   document.body.removeChild(link);
 });
 
-// ----------------------------------------
+// ---------------------------------------
 //  NOVA ANÁLISE (RECARREGA PÁGINA)
-// ----------------------------------------
+// ---------------------------------------
 newAnalysisBtn.addEventListener("click", () => {
   location.reload();
 });
