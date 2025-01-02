@@ -2,12 +2,12 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Assistente Jurídico de Contratos Sociais</title>
 
-    <!-- Tailwind CSS (CDN) -->
+    <!-- Bootstrap CSS (CDN) -->
     <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@3.2.7/dist/tailwind.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
 
@@ -24,32 +24,31 @@
     <script src="./pdf-worker.js" defer></script>
 
     <script>
-      // Aponta o worker do PDF.js para o arquivo local
+      // Define o worker do PDF.js para o arquivo local
       window.addEventListener('DOMContentLoaded', () => {
         pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf-worker.js';
       });
     </script>
   </head>
 
-  <body class="bg-gray-100 text-gray-900">
+  <body class="bg-light text-dark">
     <!-- Cabeçalho -->
-    <header class="bg-white shadow p-6 text-center">
-      <h1 class="text-2xl font-bold">Assistente Jurídico de Contratos Sociais</h1>
-      <p class="text-gray-600 mt-2">
+    <header class="bg-white shadow p-4 text-center">
+      <h1 class="h2 fw-bold">Assistente Jurídico de Contratos Sociais</h1>
+      <p class="text-secondary mb-0">
         Análise automatizada de contratos (PDF/Word) usando ChatGPT
       </p>
     </header>
 
     <!-- Conteúdo Principal -->
-    <main class="container mx-auto p-4">
-
+    <main class="container py-4">
       <!-- Seção de Botões Iniciais -->
-      <section id="home-section" class="my-8">
-        <div class="flex flex-col items-center gap-4">
-          <!-- Botão para Upload de Documento -->
+      <section id="home-section" class="my-4 text-center">
+        <!-- Botão para Upload de Documento -->
+        <div class="mb-3">
           <label
             for="fileInput"
-            class="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer hover:bg-blue-700"
+            class="btn btn-primary"
           >
             Carregar Documento (PDF/Word)
           </label>
@@ -57,43 +56,45 @@
             id="fileInput"
             type="file"
             accept=".pdf,.doc,.docx"
-            class="hidden"
+            class="d-none"
           />
+        </div>
 
-          <!-- Botão para Inserir Texto Manualmente -->
+        <!-- Botão para Inserir Texto Manualmente -->
+        <div class="mb-3">
           <button
             id="manualButton"
-            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            class="btn btn-success"
           >
             Inserir Texto Manualmente
           </button>
-
-          <!-- Link "Saiba Mais" -->
-          <a
-            href="#about-section"
-            class="underline text-blue-600 hover:text-blue-800"
-          >
-            Saiba Mais
-          </a>
         </div>
+
+        <!-- Link "Saiba Mais" -->
+        <a
+          href="#about-section"
+          class="text-decoration-underline text-info"
+        >
+          Saiba Mais
+        </a>
       </section>
 
       <!-- Seção de Editor de Texto Manual -->
       <section
         id="manual-section"
-        class="my-8 hidden border border-gray-300 p-4 rounded bg-white"
+        class="my-4 border border-2 p-3 rounded bg-white d-none"
       >
-        <h2 class="text-xl font-semibold mb-4">Editor de Texto Manual</h2>
+        <h2 class="h4 fw-semibold mb-3">Editor de Texto Manual</h2>
         <textarea
           id="manualTextArea"
           rows="8"
-          class="w-full p-2 border border-gray-300 rounded"
+          class="form-control mb-3"
           placeholder="Cole aqui o conteúdo do contrato ou digite manualmente..."
         ></textarea>
-        <div class="mt-4">
+        <div>
           <button
             id="analyzeManualBtn"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            class="btn btn-primary"
           >
             Iniciar Análise
           </button>
@@ -101,30 +102,31 @@
       </section>
 
       <!-- Seção de Progresso -->
-      <section id="loading-section" class="my-8 hidden">
-        <p class="text-center text-lg">
-          <span class="animate-pulse">Analisando documento, aguarde...</span>
+      <section id="loading-section" class="my-4 text-center d-none">
+        <p class="fs-5">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Analisando documento, aguarde...
         </p>
       </section>
 
       <!-- Seção de Resultados da Análise -->
       <section
         id="results-section"
-        class="my-8 hidden border border-gray-300 p-4 rounded bg-white"
+        class="my-4 border border-2 p-3 rounded bg-white d-none"
       >
-        <h2 class="text-xl font-semibold mb-4">Resultados da Análise</h2>
-        <div id="analysis-results" class="mb-4 text-sm whitespace-pre-wrap"></div>
+        <h2 class="h4 fw-semibold mb-3">Resultados da Análise</h2>
+        <div id="analysis-results" class="mb-3 text-body" style="white-space: pre-wrap;"></div>
         <!-- Botões de ação -->
-        <div class="flex flex-col md:flex-row gap-4">
+        <div class="d-flex flex-column flex-sm-row gap-2">
           <button
             id="downloadReportBtn"
-            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            class="btn btn-success"
           >
             Baixar Relatório
           </button>
           <button
             id="newAnalysisBtn"
-            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            class="btn btn-secondary"
           >
             Nova Análise
           </button>
@@ -132,19 +134,24 @@
       </section>
 
       <!-- Seção "Saiba Mais" -->
-      <section id="about-section" class="my-8 bg-white p-4 rounded">
-        <h2 class="text-xl font-semibold mb-2">Como Funciona?</h2>
-        <p class="text-sm leading-relaxed">
+      <section id="about-section" class="my-4 p-3 rounded bg-white">
+        <h2 class="h4 fw-semibold mb-2">Como Funciona?</h2>
+        <p class="mb-0">
           Esta aplicação faz análise de documentos (PDF/Word) ou texto digitado
           manualmente, usando a API do ChatGPT para identificar possíveis lacunas
           ou inconsistências em contratos sociais. Basta carregar seu documento ou
           colar o texto do contrato e clicar em "Iniciar Análise".
         </p>
       </section>
-
     </main>
 
     <!-- Script Principal -->
     <script src="script.js"></script>
+
+    <!-- Bootstrap JS (opcional, mas útil para componentes interativos) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      defer
+    ></script>
   </body>
 </html>
