@@ -1,53 +1,150 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Testar Resposta da API com Chave Ofuscada</title>
-</head>
-<body>
-  <h1>Teste de Resposta da API com Chave Ofuscada</h1>
-  <button onclick="testarApi()">Testar API</button>
-  <p id="resultado"></p>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Assistente Jurídico de Contratos Sociais</title>
 
-  <script>
-    // Chave ofuscada (a chave real está criptografada)
-    const chaveOfuscada = "c2stcHJvai1nMW9XY2NJcDVEMmJyeUVmdlUyRTAxblMgeERQNzA3TkhCWXRlVnY4X1MyQWY1MFdxVjBwbWRKb2pubjJTMGJueFJGa2o1UVQzQmxrY1l6MUE3QVVPYzB3bVRNdjJkSVJ2RlNaR042cmtIMWdIYlZFajByeU5fUE5Cd2NXTXdqLXFyTEw4bkd1R0JrY01fdk1h"; 
+    <!-- Tailwind CSS (CDN) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@3.2.7/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
 
-    // Função para "desofuscar" a chave (decodificando de Base64)
-    function desofuscarChave(chave) {
-      let decoded = atob(chave);  // Decodifica de Base64 para a chave original
-      return decoded;
-    }
+    <!-- PDF.js (CDN) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.13.216/build/pdf.js"
+      defer
+    ></script>
 
-    async function testarApi() {
-      try {
-        // Desofuscar a chave antes de usá-la na requisição
-        const chave = desofuscarChave(chaveOfuscada);
+    <!-- Mammoth.js local (incluso neste projeto) -->
+    <script src="./mammoth.min.js" defer></script>
 
-        // URL da API (substitua com a URL real da sua API)
-        const url = 'https://api.exemplo.com/endpoint';
+    <!-- PDF.js Worker local (pdf-worker.js) -->
+    <script src="./pdf-worker.js" defer></script>
 
-        // Configuração da requisição
-        const response = await fetch(url, {
-          method: 'GET', // ou 'POST', dependendo do tipo de API
-          headers: {
-            'Authorization': `Bearer ${chave}`, // Enviando a chave na autorização
-            'Content-Type': 'application/json'
-          }
-        });
+    <script>
+      // Aponta o worker do PDF.js para o arquivo local
+      window.addEventListener('DOMContentLoaded', () => {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf-worker.js';
+      });
+    </script>
+  </head>
 
-        // Verificando a resposta da API
-        if (response.ok) {
-          const data = await response.json();
-          document.getElementById("resultado").innerText = `Resposta da API: ${JSON.stringify(data)}`;
-        } else {
-          document.getElementById("resultado").innerText = `Erro na resposta: ${response.statusText}`;
-        }
-      } catch (error) {
-        document.getElementById("resultado").innerText = `Erro na requisição: ${error.message}`;
-      }
-    }
-  </script>
-</body>
+  <body class="bg-gray-100 text-gray-900">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow p-6 text-center">
+      <h1 class="text-2xl font-bold">Assistente Jurídico de Contratos Sociais</h1>
+      <p class="text-gray-600 mt-2">
+        Análise automatizada de contratos (PDF/Word) usando ChatGPT
+      </p>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto p-4">
+
+      <!-- Seção de Botões Iniciais -->
+      <section id="home-section" class="my-8">
+        <div class="flex flex-col items-center gap-4">
+          <!-- Botão para Upload de Documento -->
+          <label
+            for="fileInput"
+            class="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer hover:bg-blue-700"
+          >
+            Carregar Documento (PDF/Word)
+          </label>
+          <input
+            id="fileInput"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            class="hidden"
+          />
+
+          <!-- Botão para Inserir Texto Manualmente -->
+          <button
+            id="manualButton"
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Inserir Texto Manualmente
+          </button>
+
+          <!-- Link "Saiba Mais" -->
+          <a
+            href="#about-section"
+            class="underline text-blue-600 hover:text-blue-800"
+          >
+            Saiba Mais
+          </a>
+        </div>
+      </section>
+
+      <!-- Seção de Editor de Texto Manual -->
+      <section
+        id="manual-section"
+        class="my-8 hidden border border-gray-300 p-4 rounded bg-white"
+      >
+        <h2 class="text-xl font-semibold mb-4">Editor de Texto Manual</h2>
+        <textarea
+          id="manualTextArea"
+          rows="8"
+          class="w-full p-2 border border-gray-300 rounded"
+          placeholder="Cole aqui o conteúdo do contrato ou digite manualmente..."
+        ></textarea>
+        <div class="mt-4">
+          <button
+            id="analyzeManualBtn"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Iniciar Análise
+          </button>
+        </div>
+      </section>
+
+      <!-- Seção de Progresso -->
+      <section id="loading-section" class="my-8 hidden">
+        <p class="text-center text-lg">
+          <span class="animate-pulse">Analisando documento, aguarde...</span>
+        </p>
+      </section>
+
+      <!-- Seção de Resultados da Análise -->
+      <section
+        id="results-section"
+        class="my-8 hidden border border-gray-300 p-4 rounded bg-white"
+      >
+        <h2 class="text-xl font-semibold mb-4">Resultados da Análise</h2>
+        <div id="analysis-results" class="mb-4 text-sm whitespace-pre-wrap"></div>
+        <!-- Botões de ação -->
+        <div class="flex flex-col md:flex-row gap-4">
+          <button
+            id="downloadReportBtn"
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Baixar Relatório
+          </button>
+          <button
+            id="newAnalysisBtn"
+            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+          >
+            Nova Análise
+          </button>
+        </div>
+      </section>
+
+      <!-- Seção "Saiba Mais" -->
+      <section id="about-section" class="my-8 bg-white p-4 rounded">
+        <h2 class="text-xl font-semibold mb-2">Como Funciona?</h2>
+        <p class="text-sm leading-relaxed">
+          Esta aplicação faz análise de documentos (PDF/Word) ou texto digitado
+          manualmente, usando a API do ChatGPT para identificar possíveis lacunas
+          ou inconsistências em contratos sociais. Basta carregar seu documento ou
+          colar o texto do contrato e clicar em "Iniciar Análise".
+        </p>
+      </section>
+
+    </main>
+
+    <!-- Script Principal -->
+    <script src="script.js"></script>
+  </body>
 </html>
